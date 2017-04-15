@@ -5,13 +5,13 @@
 
     require_once ("app/Resources/configuration/db_configuration.php");
 
-    $route = $_GET['route'];
+    $route = filter_input(INPUT_GET, 'route', FILTER_SANITIZE_SPECIAL_CHARS);
 
     if (isset($route)) {
-        $url = $_GET['route'];
+        $url = $route;
         $url = rtrim($url, '/');
         $url = explode('/', $url);
-        require 'src/controller/'.$url[0].'.php';
+        require 'src/Controller/' . $url[0] . '.php';
     }
 
     $controller = new $url[0];
