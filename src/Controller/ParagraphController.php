@@ -1,10 +1,12 @@
 <?php
 
 use Entity\Paragraph\Paragraph;
+use Entity\Topic\Topic;
 use Service\Pagination\PaginateService as Paginator;
 use Service\Initialization\InitializationService as Init;
 use Service\Database\DatabaseService as Database;
 
+require_once ('src/Entity/Topic.php');
 require_once ('src/Entity/Paragraph.php');
 require_once ('src/Service/PaginateService.php');
 require_once ('src/Service/InitializationService.php');
@@ -43,110 +45,83 @@ class ParagraphController
         unset($paragraph);
     }
 
-    public function readAction($id)
+    public function readAction()
     {
+        $id = filter_input(INPUT_GET, 'paragraph', FILTER_SANITIZE_SPECIAL_CHARS);
+        $topic = filter_input(INPUT_GET, 'topic', FILTER_SANITIZE_SPECIAL_CHARS);
+
         $paragraph = new Paragraph();
 
-        $read = Paginator::findThisElementByCriteria($paragraph->getTable(), $id, 'topic_id', 1);
-
+        $read = Paginator::findThisElementByCriteria($paragraph->getTable(), $id, 'topic_id', $topic);
+        $formulas = Database::getAllByCriteria('formula', 'paragraph_id', $id);
+        $examples = Database::getAllByCriteria('example', 'paragraph_id', $id);
         Init::paragraphInitAfter($read, $paragraph);
 
-        if (!empty($paragraph->getContent()) && !empty($paragraph->getTopic())) {
-            echo "<p>Title: {$paragraph->getTitle()}</p>" .
-                "<br>" .
-                "<p>Content: {$paragraph->getContent()}</p>";
-
-            $last = Paginator::findLastElementByCriteria($paragraph->getTable(), $id, 'topic_id', 1);
-            $next = Paginator::findNextElementByCriteria($paragraph->getTable(), $id, 'topic_id', 1);
-
-            if ($last == null)
-                echo "<a href='../readNextAction/{$paragraph->getId()}'>Next</a>";
-            else if ($next == null)
-                echo "<a href='../readLastAction/{$paragraph->getId()}'>Last</a>";
-            else if ($last == null && $next == null)
-                echo '';
-            else
-                echo "<a href='../readLastAction/{$paragraph->getId()}'>Last</a> / " .
-                    "<a href='../readNextAction/{$paragraph->getId()}'>Next</a>";
-        } else
-            echo "<h2>Topic has not found</h2>";
-
-        unset($paragraph);
-    }
-
-    public function readLastAction($id)
-    {
-        $paragraph = new Paragraph();
-
-        $last = Paginator::findLastElement($paragraph->getTable(), $id);
-        Init::paragraphInitAfter($last, $paragraph);
+        $imgPosition = array('left', 'right');
 
         if (!empty($paragraph->getContent()) && !empty($paragraph->getTopic())) {
+            $last = Paginator::findLastElementByCriteria($paragraph->getTable(), $id, 'topic_id', $topic);
+            $next = Paginator::findNextElementByCriteria($paragraph->getTable(), $id, 'topic_id', $topic);
+            require 'app/Resources/view/paragraphTemplate.php';
+//
+//            if (!empty($formulas)){
+//                echo "<ul>";
+//                foreach ($formulas as $formula) {
+//                    echo "<li>{$formula->formulation}</li>";
+//                    $explanations = Database::getExplanationForFormula($formula->id);
+//                    if (!empty($explanations)) {
+//                        echo "<ul>";
+//                        foreach ($explanations as $explanation)
+//                            echo "<li>{$explanation->name} {$explanation->units} - {$explanation->content}</li>";
+//                        echo "</ul>";
+//                    }
+//                }
+//                echo "</ul>";
+//            }
+//
+//            if (!empty($examples)) {
+//                foreach ($examples as $example) {
+//                    echo "<div>Дано:<br>{$example->is_given}</div>" .
+//                        "<p>{$example->question}" .
+//                        "{$example->response}</p>";
+//                    echo "</div>";
+//                }
+//            }
 
-            echo "<p>Title: {$paragraph->getTitle()}</p>" .
-                "<br>" .
-                "<p>Content: {$paragraph->getContent()}</p>";
-
-            $lastOfLast = Paginator::findLastElement($paragraph->getTable(), $id - 1);
-
-            if ($lastOfLast != null)
-                echo "<a href='../readLastAction/{$paragraph->getId()}'>Last</a> / " .
-                    "<a href='../readNextAction/{$paragraph->getId()}'>Next</a>";
-            else
-                echo "<a href='../readNextAction/{$paragraph->getId()}'>Next</a>";
-        } else
-            echo "<h2>Topic has not found</h2>";
-
-        unset($paragraph);
-    }
-
-    public function readNextAction($id)
-    {
-        $paragraph = new Paragraph();
-
-        $next = Paginator::findNextElement($paragraph->getTable(), $id);
-        Init::paragraphInitAfter($next, $paragraph);
-
-        if (!empty($paragraph->getContent()) && !empty($paragraph->getTopic())) {
-
-            echo "<p>Title: {$paragraph->getTitle()}</p>" .
-                "<br>" .
-                "<p>Content: {$paragraph->getContent()}</p>";
-
-            $nextOfNext = Paginator::findNextElement($paragraph->getTable(), $id + 1);
-
-            if ($nextOfNext != null)
-                echo "<a href='../readLastAction/{$paragraph->getId()}'>Last</a> / " .
-                    "<a href='../readNextAction/{$paragraph->getId()}'>Next</a>";
-            else
-                echo "<a href='../readLastAction/{$paragraph->getId()}'>Last</a>";
-        } else
-            echo "<h2>Topic has not found</h2>";
-
-        unset($paragraph);
-    }
-
-    public function readAllAction() {
-
-        $topics = array();
-
-        $readTopics = Database::getAll('paragraph');
-
-        foreach ($readTopics as $readTopic) {
-            $topic = new Topic();
-
-            Init::topicInitAfter($readTopic, $topic);
-            array_push($topics, $topic);
-
-            unset($topic);
         }
-
-        foreach ($topics as $topic) {
-            echo "<p>" .
-                "<strong>Name: </strong>" .
-                "<a href='readAction/{$topic->getId()}'>{$topic->getName()}</a>" .
-                "</p>" .
-                "<p><strong>Description: </strong> {$topic->getDescription()}</p><hr>";
-        }
+        unset($paragraph);
     }
+
+    public function readAllAction($id) {
+
+        $topic = new Topic();
+
+        $readTopic = Paginator::findThisElement($topic->getTable(), $id);
+
+        Init::topicInitAfter($readTopic, $topic);
+
+        $paragraphs = array();
+
+        $readParagraphs = Database::getAllByCriteria('paragraph', 'topic_id', $id);
+
+        foreach ($readParagraphs as $readParagraph) {
+            $paragraph = new Paragraph();
+
+            Init::paragraphInitAfter($readParagraph, $paragraph);
+            array_push($paragraphs, $paragraph);
+
+            unset($paragraph);
+        }
+        session_start();
+        if (!empty($_SESSION['name'])) {
+            $session = $_SESSION['name'];
+        } else {
+            $session = '';
+        }
+        $title = $topic->getId() . "-й роздiл";
+        $template = "paragraphs";
+        $path = '../../';
+        require_once 'app/Resources/view/baseOtherTemplate.php';
+    }
+
 }

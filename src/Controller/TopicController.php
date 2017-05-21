@@ -13,6 +13,7 @@ require_once ('src/Service/DatabaseService.php');
 class TopicController
 {
 
+
     public function createAction()
     {
         $name = filter_input(INPUT_POST, 'name',  FILTER_SANITIZE_SPECIAL_CHARS);
@@ -133,12 +134,14 @@ class TopicController
             unset($topic);
         }
 
-        foreach ($topics as $topic) {
-            echo "<p>" .
-                "<strong>Name: </strong>" .
-                "<a href='ParagraphController/readAction/{$topic->getId()}'>{$topic->getName()}</a>" .
-                "</p>" .
-                "<p><strong>Description: </strong> {$topic->getDescription()}</p><hr>";
-        }
+        $template = "topics";
+        require_once 'app/Resources/view/baseOtherTemplate.php';
+//        foreach ($topics as $topic) {
+//            echo "<p>" .
+//                "<strong>Name: </strong>" .
+//                "<div id='topic{$topic->getId()}' class='topic'>{$topic->getName()}</div>" .
+//                "</p>" .
+//                "<p><strong>Description: </strong> {$topic->getDescription()}</p><hr>";
+//        }
     }
 }

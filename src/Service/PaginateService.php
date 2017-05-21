@@ -8,6 +8,8 @@ use ORM;
 class PaginateService
 {
 
+
+
     /**
      * @param $table
      * @param $id
@@ -37,7 +39,6 @@ class PaginateService
                 $criteria => $value
             ))
             ->findOne();
-
         return $element;
     }
 

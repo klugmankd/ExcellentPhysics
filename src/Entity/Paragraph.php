@@ -32,9 +32,14 @@ class Paragraph
     private $img;
 
     /**
-     * @var int $example
+     * @var array $examples
      */
-    private $example;
+    private $examples;
+
+    /**
+     * @var array $formulas
+     */
+    private $formulas;
 
     /**
      * @var int $topic
@@ -143,5 +148,37 @@ class Paragraph
     public function getTable()
     {
         return $this->table;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExamples()
+    {
+        return $this->examples;
+    }
+
+    /**
+     * @param array $examples
+     */
+    public function setExamples($examples)
+    {
+        $this->examples = $examples;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFormulas()
+    {
+        return $this->formulas;
+    }
+
+    /**
+     * @param array $formulas
+     */
+    public function setFormulas($formulas)
+    {
+        $this->formulas = $formulas;
     }
 }

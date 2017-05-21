@@ -1,15 +1,15 @@
 <?php
 
-namespace Entity\Formula;
+namespace Entity\Tests;
 
 
-class Formula
+class TestQuestion
 {
 
     /**
      * @var string $table
      */
-    private $table = 'formula';
+    private $table = 'test_question';
 
     /**
      * @var int $id
@@ -22,14 +22,22 @@ class Formula
     private $formulation;
 
     /**
-     * @var int $paragraph
+     * @var int $answer
      */
-    private $paragraph;
+    private $answer;
 
     /**
-     * @var array $explanation
+     * @var int $topic
      */
-    private $explanation;
+    private $topic;
+
+    /**
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
 
     /**
      * @return int
@@ -37,6 +45,14 @@ class Formula
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
     /**
@@ -58,41 +74,33 @@ class Formula
     /**
      * @return int
      */
-    public function getParagraph()
+    public function getAnswer()
     {
-        return $this->paragraph;
+        return $this->answer;
     }
 
     /**
-     * @param int $paragraph
+     * @param int $answer
      */
-    public function setParagraph($paragraph)
+    public function setAnswer($answer)
     {
-        $this->paragraph = $paragraph;
+        $this->answer = $answer;
     }
 
     /**
-     * @return array
+     * @return int
      */
-    public function getExplanation()
+    public function getTopic()
     {
-        return $this->explanation;
+        return $this->topic;
     }
 
     /**
-     * @param array $explanation
+     * @param int $topic
      */
-    public function setExplanation($explanation)
+    public function setTopic($topic)
     {
-        $this->explanation = $explanation;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTable()
-    {
-        return $this->table;
+        $this->topic = $topic;
     }
 
 }
